@@ -59,6 +59,7 @@ async function runCode(language, code, input) {
 app.post("/run",async (req,res) => {
     const {language,code,input} = req.body
     const  result = await runCode(language,code,input)
+    result.replace("File \"/opt/render/project/src/code.","")
     res.json({output:result})
 })
 app.listen(3000,()=>{
