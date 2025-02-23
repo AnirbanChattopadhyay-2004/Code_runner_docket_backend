@@ -2,7 +2,10 @@ const fs = require('fs').promises;
 const { exec } = require('child_process');
 const path = require('path');
 const express = require("express")
+const cors = require("cors")
 const app = express()
+app.use(cors({origin: 'https://code-runner-frontend-ruby.vercel.app'}))
+// app.use(cors({origin: '*'}))
 app.use(express.json())
 const LANGUAGES = {
   python: {
@@ -10,7 +13,7 @@ const LANGUAGES = {
     runCmd: file => `python ${file}<input.txt`
   },
   javascript: {
-    extension: 'js',
+    extension: 'js', 
     runCmd: file => `node ${file}<input.txt`
   },
   java: {
@@ -19,7 +22,7 @@ const LANGUAGES = {
   },
   cpp: {
     extension: 'cpp',
-    runCmd: file => `g++ ${file} -o code && ./code < input.txt`
+    runCmd: file => `g++ ${file} -o Code && ./Code < input.txt`
   }
 };
 
@@ -30,7 +33,7 @@ async function runCode(language, code, input) {
   }
 
   const config = LANGUAGES[language];
-  const fileName = `code.${config.extension}`;
+  const fileName = `Code.${config.extension}`;
 
   try {
     // Write code to file
