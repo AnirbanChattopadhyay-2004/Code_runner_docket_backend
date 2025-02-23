@@ -1,1 +1,0 @@
-print(list(f"{x} is {'even' if x%2==0 else 'odd'} and {'prime' if x>1 and all(x%i!=0 for i in range(2, int(x**0.5)+1)) else 'not prime'}" for x in map(int, input("Enter numbers separated by space: ").split())))
