@@ -2,28 +2,29 @@ const fs = require('fs').promises;
 const { exec } = require('child_process');
 const path = require('path');
 const express = require("express")
-// Language configurations (without Docker)
 const app = express()
+app.use(express.json())
 const LANGUAGES = {
   python: {
     extension: 'py',
-    runCmd: file => `python ${file}`
+    runCmd: file => `python ${file}<input.txt`
   },
   javascript: {
     extension: 'js',
-    runCmd: file => `node ${file}`
+    runCmd: file => `node ${file}<input.txt`
   },
   java: {
     extension: 'java',
-    runCmd: file => `javac ${file} && java ${file.replace('.java', '')}`
+    runCmd: file => `javac ${file} && java ${file.replace('.java', '<input.txt')}`
   },
   cpp: {
     extension: 'cpp',
-    runCmd: file => `g++ ${file} -o code && ./code`
+    runCmd: file => `g++ ${file} -o code && ./code < input.txt`
   }
 };
 
-async function runCode(language, code) {
+
+async function runCode(language, code, input) {
   if (!LANGUAGES[language]) {
     throw new Error(`Unsupported language: ${language}`);
   }
@@ -33,8 +34,8 @@ async function runCode(language, code) {
 
   try {
     // Write code to file
-    await fs.writeFile(fileName, code);
-
+    await fs.writeFile(fileName, code)
+    await fs.writeFile("input.txt",input)
     // Execute code directly (without Docker)
     const output = await new Promise((resolve, reject) => {
       exec(config.runCmd(fileName), { timeout: 5000 }, (error, stdout, stderr) => {
@@ -55,19 +56,11 @@ async function runCode(language, code) {
   }
 }
 
-// Example usage
-async function example() {
-  console.log('Running Python code:');
-  const pythonResult = await runCode('python', `print("Hello from Python!")`);
-  console.log(pythonResult);
-  return pythonResult
-}
-app.get("/",async (req,res)=>{
-    const resp = await example()
-    console.log(resp)
-    res.json({output:resp})
+app.post("/run",async (req,res) => {
+    const {language,code,input} = req.body
+    const  result = await runCode(language,code,input)
+    res.json({output:result})
 })
 app.listen(3000,()=>{
     console.log("Running on port 3000")
 })
-// example();
