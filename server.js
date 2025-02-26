@@ -5,12 +5,11 @@ const express = require("express")
 const cors = require("cors")
 const app = express()
 app.use(cors({origin: 'https://code-runner-frontend-ruby.vercel.app'}))
-// app.use(cors({origin: '*'}))
 app.use(express.json())
 const LANGUAGES = {
   python: {
     extension: 'py',
-    runCmd: file => `python ${file}<input.txt`
+    runCmd: file => `python3 ${file}<input.txt`
   },
   javascript: {
     extension: 'js', 
@@ -49,7 +48,7 @@ async function runCode(language, code, input) {
         resolve(stdout);
       });
     });
-
+    console.log(output)
     return output;
   } catch (error) {
     return `Error: ${error}`;
@@ -59,6 +58,7 @@ async function runCode(language, code, input) {
   }
 }
 
+runCode("python","print('hello world')","")
 app.post("/run",async (req,res) => {
     const {language,code,input} = req.body
     const  result = await runCode(language,code,input)
